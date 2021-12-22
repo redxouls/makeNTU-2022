@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Magic Bike</title>
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.css"
+      type="text/css"
+    />
+    <div id="map"></div>
+
+    <script>
+      mapboxgl.accessToken =
+        "pk.eyJ1IjoicmVkeG91bHMiLCJhIjoiY2t4N2R1Nm1uMHl4aTJwcXViYno1Ym9sNCJ9.fByzZrach_1gQlboB02hCg";
+      const map = new mapboxgl.Map({
+        container: "map",
+        style: "mapbox://styles/mapbox/streets-v11",
+        center: [121.542242, 25.019011],
+        zoom: 13,
+      });
+      const newDirectionControl = new MapboxDirections({
+        accessToken: mapboxgl.accessToken,
+        profile: "mapbox/cycling",
+      });
+
+      newDirectionControl.on("origin", (e) => {
+        console.log(e.feature.geometry.coordinates);
+        fetch("/api", {
+          body: JSON.stringify({ start: e.feature.geometry.coordinates }), // must match 'Content-Type' header
+          method: "POST", // *GET, POST, PUT, DELETE, etc.
+          headers: {
+            "content-type": "application/json",
+          },
+        })
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (myJson) {
+            console.log(myJson);
+          });
+      });
+
+      newDirectionControl.on("destination", (e) => {
+        console.log(e.feature.geometry.coordinates);
+        fetch("/api", {
+          body: JSON.stringify({ end: e.feature.geometry.coordinates }), // must match 'Content-Type' header
+          method: "POST", // *GET, POST, PUT, DELETE, etc.
+          headers: {
+            "content-type": "application/json",
+          },
+        })
+          .then(function (response) {
+            return response.json();
+          })
+          .then(function (myJson) {
+            console.log(myJson);
+          });
+      });
+      map.addControl(newDirectionControl, "top-left");
+    </script>
+  </body>
+</html>
