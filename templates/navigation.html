@@ -104,31 +104,101 @@
                 console.log(myJson);
               });
           });
+
           map.addControl(newDirectionControl, "top-left");
           map.addControl(new mapboxgl.NavigationControl());
+
+          // class ToggleControl {
+          //   constructor(options) {
+          //     this._options = Object.assign({}, this._options, options);
+          //   }
+
+          //   onAdd(map, cs) {
+          //     this.map = map;
+          //     this.container = document.createElement("div");
+          //     this.container.className = `${this._options.className}`;
+          //     const button = this._createButton("monitor_button");
+          //     this.container.appendChild(button);
+          //     return this.container;
+          //   }
+          //   onRemove() {
+          //     this.container.parentNode.removeChild(this.container);
+          //     this.map = undefined;
+          //   }
+          //   _createButton(className) {
+          //     const el = window.document.createElement("button");
+
+          //     const svg = document.createElementNS(
+          //       "http://www.w3.org/2000/svg",
+          //       "svg"
+          //     );
+          //     el.setAttribute("width", 29);
+          //     el.setAttribute("height", 29);
+          //     el.setAttribute("display", "block");
+          //     // button.setAttribute("viewBox", "0 0 20 20");
+          //     // button.setAttribute("fill", "#333");
+
+          //     const icon = document.createElementNS(
+          //       "http://www.w3.org/2000/svg",
+          //       "path"
+          //     ); //Create a path in SVG's namespace
+          //     icon.setAttribute(
+          //       "d",
+          //       "M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7z"
+          //     ); //Set path's data
+
+          //     const circle = document.createElementNS(
+          //       "http://www.w3.org/2000/svg",
+          //       "circle"
+          //     ); //Create a path in SVG's namespace
+
+          //     svg.appendChild(icon);
+
+          //     const span = document.createElement("span");
+          //     span.setAttribute(
+          //       "background-image",
+          //       "url(data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill='%23333'%3E %3Cpath d='M10 4C9 4 9 5 9 5v.1A5 5 0 0 0 5.1 9H5s-1 0-1 1 1 1 1 1h.1A5 5 0 0 0 9 14.9v.1s0 1 1 1 1-1 1-1v-.1a5 5 0 0 0 3.9-3.9h.1s1 0 1-1-1-1-1-1h-.1A5 5 0 0 0 11 5.1V5s0-1-1-1zm0 2.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 1 1 0-7z'/%3E %3Ccircle id='dot' cx='10' cy='10' r='2'/%3E %3Cpath id='stroke' d='M14 5l1 1-9 9-1-1 9-9z' display='none'/%3E %3C/svg%3E)"
+          //     );
+          //     el.appendChild(span);
+
+          //     el.className = className;
+          //     el.addEventListener(
+          //       "click",
+          //       (e) => {
+          //         geolocate.trigger();
+          //       },
+          //       false
+          //     );
+          //     return el;
+          //   }
+          // }
+          // const toggleControl = new ToggleControl({
+          //   className: "mapboxgl-ctrl",
+          // });
+          // map.addControl(toggleControl, "top-right");
 
           const currentMarker = new mapboxgl.Marker()
             .setLngLat(coordinates)
             .addTo(map);
 
-          window.setInterval(
-            (currentMarker, map) => {
-              fetch("/api/current", {
-                method: "GET",
-                redirect: "follow",
-              })
-                .then(function (response) {
-                  return response.json();
-                })
-                .then(function (myJson) {
-                  const { coordinates } = myJson;
-                  currentMarker.setLngLat(coordinates);
-                });
-            },
-            1000,
-            currentMarker,
-            newDirectionControl
-          );
+          // window.setInterval(
+          //   (currentMarker, map) => {
+          //     fetch("/api/current", {
+          //       method: "GET",
+          //       redirect: "follow",
+          //     })
+          //       .then(function (response) {
+          //         return response.json();
+          //       })
+          //       .then(function (myJson) {
+          //         const { coordinates } = myJson;
+          //         currentMarker.setLngLat(coordinates);
+          //       });
+          //   },
+          //   1000,
+          //   currentMarker,
+          //   newDirectionControl
+          // );
         });
     </script>
   </body>
