@@ -14,12 +14,11 @@ class Subscriber():
 
     def on_message(self, client, obj, msg):
         self.data[msg.topic] = json.loads(msg.payload.decode())
-        print(f"TOPIC:{msg.topic}, VALUE:{msg.payload}")
-        print(self.data)
+        # print(f"TOPIC:{msg.topic}, VALUE:{msg.payload}")
+        # print(self.data)
 
     def main(self):
         # Establish connection to mqtt broker
-        
         self.client.on_message = self.on_message
         self.client.connect(host=self.ip, port=self.port)
         self.client.subscribe('gps', 0)

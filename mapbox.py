@@ -1,52 +1,52 @@
-import os, random, threading
+import os, threading
 from flask import Flask, render_template, request, jsonify, send_from_directory
 
 from sensors.Subscriber import Subscriber
 
 app = Flask(__name__, static_folder="build", template_folder="build")
 
-app_data = {}
 
 subscriber = Subscriber()
 
-def sensor_listien(subscriber):
-    subscriber.main()
-
-t = threading.Thread(target=sensor_listien, args=(subscriber,))
+t = threading.Thread(target=subscriber.main)
 t.start()
 
-# @app.route("/")
-# def home():
-#     return render_template("navigation.html")
+app_data = {}
 
 @app.route("/api/navigate", methods=['POST'])
 def navigate():
     global app_data
-    app_data = request.json
+
     request_data = request.json
-    
     if "start" in request_data:
         app_data["start"] = request_data["start"]
-    elif "end" in request_data:
+    if "end" in request_data:
         app_data["end"] = request_data["end"]
-    
+    print(app_data)
     return jsonify(request_data)
 
 
-@app.route("/api/current", methods=['GET'])
-def current():
+@app.route("/api/current/<mode>", methods=['GET'])
+def current(mode):
     global subscriber
+
+    if mode == "location":
+        current_location = {
+            "coordinates": subscriber.data["gps"],
+        }
+        return jsonify(current_location)
+    elif mode == "bearing":
+        bearing = {
+            "bearing": subscriber.data["compass"]["bearing"],
+        }
+
+        return jsonify(bearing)
     # coord = get_coord()
     # coord = [121.54373533333333, 25.019046666666668]
-    
-    current_location = {
-        "coordinates": subscriber.data["gps"],
-    }
 
     # current_location = {
     #     "coordinates": [coord[0]+ random.random()/(10e4), coord[1]+ random.random()/(10e4)]
     # }
-    return jsonify(current_location)
 
 @app.route("/api/data", methods=['GET'])
 def data():

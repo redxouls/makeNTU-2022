@@ -63,13 +63,46 @@ class Map {
     );
 
     this.map.addControl(new PitchControl({ minpitchzoom: 17 }));
-    // this.updateCurentMarker();
+    this.updateCurentMarker();
+
+    this.directions.on("origin", (e) => {
+      console.log(e.feature.geometry.coordinates);
+      fetch("/api/navigate", {
+        body: JSON.stringify({ start: e.feature.geometry.coordinates }), // must match 'Content-Type' header
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (myJson) {
+          console.log(myJson);
+        });
+    });
+
+    this.directions.on("destination", (e) => {
+      console.log(e.feature.geometry.coordinates);
+      fetch("/api/navigate", {
+        body: JSON.stringify({ end: e.feature.geometry.coordinates }), // must match 'Content-Type' header
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (myJson) {
+          console.log(myJson);
+        });
+    });
   }
 
   updateCurentMarker() {
     console.log("update my position");
     const { currentMarker } = this;
-    console.log(currentMarker);
     setInterval(
       () => {
         PositionAPI.getCurentPosition().then((response) => {
