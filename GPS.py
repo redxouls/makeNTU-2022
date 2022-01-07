@@ -1,8 +1,7 @@
 import serial
 import pynmea2
- 
 
-ser = serial.Serial('/dev/ttyTHS1', 9600, timeout=0.2)
+ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=0.2)
 
 def get_coord():
     while True:

@@ -4,7 +4,10 @@ import MapboxDirections from "@mapbox/mapbox-gl-directions/dist/mapbox-gl-direct
 import "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css";
 
 import { PositionAPI } from "./api.js";
-import SetOriginControl from "./setOriginControl.js";
+import SetOriginControl from "./controls/setOriginToggle.js";
+
+import PitchToggle from "./controls/pitchToggle.js";
+import "./controls/pitchToggle.css";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoicmVkeG91bHMiLCJhIjoiY2t4N2R1Nm1uMHl4aTJwcXViYno1Ym9sNCJ9.fByzZrach_1gQlboB02hCg";
@@ -24,6 +27,12 @@ class Map {
       accessToken: mapboxgl.accessToken,
       unit: "metric",
       profile: "mapbox/cycling",
+      interactive: false,
+      controls: {
+        inputs: true,
+        instructions: false,
+        profileSwitcher: true,
+      },
     });
 
     // Integrates directions control with map
@@ -43,8 +52,9 @@ class Map {
       locateCallback: this.updateStartPoint.bind(this),
     });
     this.map.addControl(setOriginControl, "top-right");
+    this.map.addControl(new PitchToggle({ minpitchzoom: 17 }));
 
-    this.updateCurentMarker();
+    // this.updateCurentMarker();
   }
 
   updateCurentMarker() {
