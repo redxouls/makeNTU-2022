@@ -53,8 +53,8 @@ class Map {
     });
     this.map.addControl(setOriginControl, "top-right");
     this.map.addControl(new PitchToggle({ minpitchzoom: 17 }));
-
-    // this.updateCurentMarker();
+    
+    this.updateCurentMarker();
   }
 
   updateCurentMarker() {
