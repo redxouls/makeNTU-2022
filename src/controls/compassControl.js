@@ -1,4 +1,4 @@
-export default class setOriginControl {
+export default class CompassControl {
   constructor(options) {
     this._options = Object.assign({}, this._options, options);
     console.log("setOriginToggle");
@@ -8,9 +8,9 @@ export default class setOriginControl {
     this._map = map;
 
     this._btn = document.createElement("button");
-    this._btn.className = "mapboxgl-ctrl-icon mapboxgl-ctrl-current-location";
+    this._btn.className = "mapboxgl-ctrl-icon mapboxgl-ctrl-compass-toggle";
     this._btn.type = "button";
-    this._btn["aria-label"] = "Toggle To Set Origin";
+    this._btn["aria-label"] = "Toggle To Update Map Bearing";
 
     this._btn.onclick = () => {
       this._options.locateCallback();

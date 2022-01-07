@@ -7,5 +7,7 @@ const errorHandling = (error) => {
 
 export const PositionAPI = {
   getCurentPosition: () =>
-    axios.get(`/api/current`).catch((error) => errorHandling(error)),
+    axios.get(`/api/current/location`).catch((error) => errorHandling(error)),
+  getCurentBearing: () =>
+    axios.get(`/api/current/bearing`).catch((error) => errorHandling(error)),
 };

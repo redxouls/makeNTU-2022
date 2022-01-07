@@ -4,9 +4,10 @@ import MapboxDirections from "@mapbox/mapbox-gl-directions/dist/mapbox-gl-direct
 import "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css";
 
 import { PositionAPI } from "./api.js";
-import SetOriginControl from "./controls/setOriginToggle.js";
 
-import PitchToggle from "./controls/pitchToggle.js";
+import SetOriginControl from "./controls/setOriginToggle.js";
+import PitchControl from "./controls/pitchControl.js";
+import CompassControl from "./controls/compassControl.js";
 import "./controls/pitchToggle.css";
 
 mapboxgl.accessToken =
@@ -38,7 +39,7 @@ class Map {
     // Integrates directions control with map
     this.map.addControl(this.directions, "top-left");
 
-    const navigation = new mapboxgl.NavigationControl();
+    const navigation = new mapboxgl.NavigationControl({ showCompass: false });
     this.map.addControl(navigation);
 
     const coordinates = [121.54373533333333, 25.0190466666666684];
@@ -47,14 +48,22 @@ class Map {
       .setLngLat(coordinates)
       .addTo(this.map);
 
-    const setOriginControl = new SetOriginControl({
-      className: "mapboxgl-ctrl",
-      locateCallback: this.updateStartPoint.bind(this),
-    });
-    this.map.addControl(setOriginControl, "top-right");
-    this.map.addControl(new PitchToggle({ minpitchzoom: 17 }));
-    
-    this.updateCurentMarker();
+    this.map.addControl(
+      new CompassControl({
+        locateCallback: this.updateBearing.bind(this),
+      }),
+      "top-right"
+    );
+
+    this.map.addControl(
+      new SetOriginControl({
+        locateCallback: this.updateStartPoint.bind(this),
+      }),
+      "top-right"
+    );
+
+    this.map.addControl(new PitchControl({ minpitchzoom: 17 }));
+    // this.updateCurentMarker();
   }
 
   updateCurentMarker() {
@@ -78,6 +87,16 @@ class Map {
       function (response) {
         const { coordinates } = response.data;
         this.directions.setOrigin(coordinates);
+      }.bind(this)
+    );
+  }
+
+  updateBearing() {
+    PositionAPI.getCurentBearing().then(
+      function (response) {
+        const { bearing } = response.data;
+        this.map.easeTo({ pitch: 0, bearing });
+        console.log(bearing);
       }.bind(this)
     );
   }
