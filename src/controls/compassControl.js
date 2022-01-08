@@ -13,7 +13,7 @@ export default class CompassControl {
     this._btn["aria-label"] = "Toggle To Update Map Bearing";
 
     this._btn.onclick = () => {
-      this._options.locateCallback();
+      this._options.updateCallback();
     };
 
     this._container = document.createElement("div");

@@ -11,9 +11,15 @@ export const PositionAPI = {
   getCurentBearing: () =>
     axios.get(`/api/current/bearing`).catch((error) => errorHandling(error)),
   postNavigation: (data) =>
-    axios.post(`/api/navigate`, JSON.stringify(data), {
-      headers: { 
-        'Content-Type': 'application/json'
-      }}
-      ).catch((error) => errorHandling(error)),
+    axios
+      .post(`/api/navigate`, JSON.stringify(data), {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .catch((error) => errorHandling(error)),
+  startNavigation: () =>
+    axios.get(`/api/navigate/start`).catch((error) => errorHandling(error)),
+  stopNavigation: () =>
+    axios.get(`/api/navigate/stop`).catch((error) => errorHandling(error)),
 };

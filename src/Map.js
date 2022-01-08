@@ -5,17 +5,19 @@ import "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css";
 
 import { PositionAPI } from "./api.js";
 
-import SetOriginControl from "./controls/setOriginControl.js";
-import PitchControl from "./controls/pitchControl.js";
-import CompassControl from "./controls/compassControl.js";
-import NavigateControl from "./controls/navigateControl.js";
-import "./controls/Controls.css";
+import {
+  SetOriginControl,
+  PitchControl,
+  CompassControl,
+  NavigateControl,
+} from "./controls";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoicmVkeG91bHMiLCJhIjoiY2t4N2R1Nm1uMHl4aTJwcXViYno1Ym9sNCJ9.fByzZrach_1gQlboB02hCg";
 
 class Map {
   constructor(ref) {
+    this.navigating = false;
     this.container = ref;
     this.map = new mapboxgl.Map({
       container: this.container,
@@ -51,7 +53,7 @@ class Map {
 
     this.map.addControl(
       new CompassControl({
-        locateCallback: this.updateBearing.bind(this),
+        updateCallback: this.updateBearing.bind(this),
       }),
       "top-right"
     );
@@ -65,14 +67,13 @@ class Map {
 
     this.map.addControl(
       new NavigateControl({
-        locateCallback: this.updateStartPoint.bind(this),
+        startCallback: this.startNavigation.bind(this),
+        stopCallback: this.stopNavigation.bind(this),
       }),
       "top-right"
     );
 
     this.map.addControl(new PitchControl({ minpitchzoom: 17 }));
-    this.updateCurentMarker();
-    this.updateCurentBearing();
 
     this.directions.on("origin", (e) => {
       console.log(e.feature.geometry.coordinates);
@@ -107,6 +108,9 @@ class Map {
           console.log(myJson);
         });
     });
+
+    // this.updateCurentMarker();
+    // this.updateCurentBearing();
   }
 
   updateCurentMarker() {
@@ -156,6 +160,14 @@ class Map {
         console.log(bearing);
       }.bind(this)
     );
+  }
+
+  startNavigation() {
+    PositionAPI.startNavigation();
+  }
+
+  stopNavigation() {
+    PositionAPI.stopNavigation();
   }
 }
 

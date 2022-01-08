@@ -13,7 +13,7 @@ export default class setOriginControl {
     this._btn["aria-label"] = "Toggle To Set Origin";
 
     this._btn.onclick = () => {
-      this._options.locateCallback();
+      this._options.updateCallback();
     };
 
     this._container = document.createElement("div");
