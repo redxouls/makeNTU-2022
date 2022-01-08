@@ -5,10 +5,11 @@ import "@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css";
 
 import { PositionAPI } from "./api.js";
 
-import SetOriginControl from "./controls/setOriginToggle.js";
+import SetOriginControl from "./controls/setOriginControl.js";
 import PitchControl from "./controls/pitchControl.js";
 import CompassControl from "./controls/compassControl.js";
-import "./controls/pitchToggle.css";
+import NavigateControl from "./controls/navigateControl.js";
+import "./controls/Controls.css";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoicmVkeG91bHMiLCJhIjoiY2t4N2R1Nm1uMHl4aTJwcXViYno1Ym9sNCJ9.fByzZrach_1gQlboB02hCg";
@@ -57,6 +58,13 @@ class Map {
 
     this.map.addControl(
       new SetOriginControl({
+        locateCallback: this.updateStartPoint.bind(this),
+      }),
+      "top-right"
+    );
+
+    this.map.addControl(
+      new NavigateControl({
         locateCallback: this.updateStartPoint.bind(this),
       }),
       "top-right"
