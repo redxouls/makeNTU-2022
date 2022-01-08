@@ -5,16 +5,18 @@ import serial
 print("UART Demonstration Program")
 print("NVIDIA Jetson Nano Developer Kit")
 
-
-serial_port = serial.Serial(
-    port="/dev/ttyACM2",
-    baudrate=115200,
-    bytesize=serial.EIGHTBITS,
-    parity=serial.PARITY_NONE,
-    stopbits=serial.STOPBITS_ONE,
-)
-# Wait a second to let the port initialize
-time.sleep(1)
+try:
+    serial_port = serial.Serial(
+        port="/dev/ttyACM1",
+        baudrate=115200,
+        bytesize=serial.EIGHTBITS,
+        parity=serial.PARITY_NONE,
+        stopbits=serial.STOPBITS_ONE,
+    )
+    # Wait a second to let the port initialize
+    time.sleep(1)
+except:
+    serial_port = None
 
 class Compass:
     def __init__(self):
@@ -39,12 +41,12 @@ class Compass:
             
 myCompass = Compass()
 
-
 def compass_read():
     try:
         # Send a simple header
-        if serial_port.inWaiting() > 0:
-            for _ in range(2):
+        if serial_port.inWaiting():
+            while serial_port.inWaiting():
+            # for _ in range(5):
                 data = serial_port.readline()
                 myCompass.update(data=data.decode())
             

@@ -64,6 +64,7 @@ class Map {
 
     this.map.addControl(new PitchControl({ minpitchzoom: 17 }));
     this.updateCurentMarker();
+    this.updateCurentBearing();
 
     this.directions.on("origin", (e) => {
       console.log(e.feature.geometry.coordinates);
@@ -112,6 +113,21 @@ class Map {
       },
       1000,
       currentMarker
+    );
+  }
+
+  updateCurentBearing() {
+    console.log("update my bearing");
+    const { map } = this;
+    setInterval(
+      () => {
+        PositionAPI.getCurentBearing().then((response) => {
+          const { bearing } = response.data;
+          map.easeTo({ pitch: 0, bearing });
+        });
+      },
+      100,
+      map
     );
   }
 

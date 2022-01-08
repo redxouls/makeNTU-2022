@@ -2,56 +2,55 @@ import os, threading
 from flask import Flask, render_template, request, jsonify, send_from_directory
 
 from sensors.Subscriber import Subscriber
+from controller.Navigator import Navigator
 
 app = Flask(__name__, static_folder="build", template_folder="build")
 
-
 subscriber = Subscriber()
+navigator =  Navigator(subscriber=subscriber)
 
 t = threading.Thread(target=subscriber.main)
 t.start()
 
-app_data = {}
-
 @app.route("/api/navigate", methods=['POST'])
-def navigate():
-    global app_data
+def navigate_post():
+    global navigator
 
     request_data = request.json
     if "start" in request_data:
-        app_data["start"] = request_data["start"]
+        navigator.setOrigin(request_data["start"])
     if "end" in request_data:
-        app_data["end"] = request_data["end"]
-    print(app_data)
+        navigator.setDestination(request_data["end"])
+    
     return jsonify(request_data)
 
+@app.route("/api/navigate/<mode>", methods=['GET'])
+def navigate_get(mode):
+    global navigator
+    
+    if mode == "start":
+        t = threading.Thread(target=navigator.navigate)
+        t.start()
+        
+    elif mode == "stop":
+        navigator.stop()
+    
+    return jsonify({"status": 200})
 
 @app.route("/api/current/<mode>", methods=['GET'])
 def current(mode):
     global subscriber
 
+    data = {}
     if mode == "location":
-        current_location = {
-            "coordinates": subscriber.data["gps"],
+        data = {
+            "coordinates": subscriber.data.get("gps", [121.543764, 25.019388])
         }
-        return jsonify(current_location)
     elif mode == "bearing":
-        bearing = {
-            "bearing": subscriber.data["compass"]["bearing"],
+        data = {
+            "bearing": subscriber.data.get("compass").get("azimuth", 0),
         }
-
-        return jsonify(bearing)
-    # coord = get_coord()
-    # coord = [121.54373533333333, 25.019046666666668]
-
-    # current_location = {
-    #     "coordinates": [coord[0]+ random.random()/(10e4), coord[1]+ random.random()/(10e4)]
-    # }
-
-@app.route("/api/data", methods=['GET'])
-def data():
-    global app_data
-    return jsonify(app_data)
+    return jsonify(data)
 
 # Serve React App
 @app.route('/', defaults={'path': ''})

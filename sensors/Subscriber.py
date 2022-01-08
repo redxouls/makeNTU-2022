@@ -5,7 +5,13 @@ import paho.mqtt.client as mqtt
 class Subscriber():
     def __init__(self, args=None):
         self.client = mqtt.Client()
-        self.data = dict()
+        self.data = {
+            "gps": [121.543764, 25.019388],
+            "compass": {
+                "bearing": 0,
+                "azimuth": 0,
+            }
+        }
         self.ip = "localhost"
         self.port = 1883
         if args:

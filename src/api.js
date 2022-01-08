@@ -10,6 +10,10 @@ export const PositionAPI = {
     axios.get(`/api/current/location`).catch((error) => errorHandling(error)),
   getCurentBearing: () =>
     axios.get(`/api/current/bearing`).catch((error) => errorHandling(error)),
-  // postNavigation: (data) =>
-  //   axios.post(`/api/navigation`, data).catch((error) => errorHandling(error)),
+  postNavigation: (data) =>
+    axios.post(`/api/navigate`, JSON.stringify(data), {
+      headers: { 
+        'Content-Type': 'application/json'
+      }}
+      ).catch((error) => errorHandling(error)),
 };
