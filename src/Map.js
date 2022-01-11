@@ -109,7 +109,7 @@ class Map {
         });
     });
 
-    // this.updateCurentMarker();
+    this.updateCurentMarker();
     // this.updateCurentBearing();
   }
 

@@ -9,7 +9,7 @@ export default class NavigateControl {
     this._map = map;
 
     this._btn = document.createElement("button");
-    this._btn.className = "mapboxgl-ctrl-icon mapboxgl-ctrl-navigating";
+    this._btn.className = "mapboxgl-ctrl-icon mapboxgl-ctrl-not-navigating";
     this._btn.type = "button";
     this._btn["aria-label"] = "Toggle To Update Map Bearing";
 
