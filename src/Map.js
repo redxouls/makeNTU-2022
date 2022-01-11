@@ -60,7 +60,7 @@ class Map {
 
     this.map.addControl(
       new SetOriginControl({
-        locateCallback: this.updateStartPoint.bind(this),
+        updateCallback: this.updateStartPoint.bind(this),
       }),
       "top-right"
     );
@@ -119,8 +119,11 @@ class Map {
     setInterval(
       () => {
         PositionAPI.getCurentPosition().then((response) => {
-          const { coordinates } = response.data;
-          currentMarker.setLngLat(coordinates);
+          console.log(response);
+          if (response) {
+            const { coordinates } = response.data;
+            currentMarker.setLngLat(coordinates);
+          }
         });
       },
       1000,
@@ -134,8 +137,10 @@ class Map {
     setInterval(
       () => {
         PositionAPI.getCurentBearing().then((response) => {
-          const { bearing } = response.data;
-          map.easeTo({ pitch: 0, bearing });
+          if (response) {
+            const { bearing } = response.data;
+            map.easeTo({ pitch: 0, bearing });
+          }
         });
       },
       100,
@@ -146,8 +151,10 @@ class Map {
   updateStartPoint() {
     PositionAPI.getCurentPosition().then(
       function (response) {
-        const { coordinates } = response.data;
-        this.directions.setOrigin(coordinates);
+        if (response) {
+          const { coordinates } = response.data;
+          this.directions.setOrigin(coordinates);
+        }
       }.bind(this)
     );
   }
@@ -155,9 +162,11 @@ class Map {
   updateBearing() {
     PositionAPI.getCurentBearing().then(
       function (response) {
-        const { bearing } = response.data;
-        this.map.easeTo({ pitch: 0, bearing });
-        console.log(bearing);
+        if (response) {
+          const { bearing } = response.data;
+          this.map.easeTo({ pitch: 0, bearing });
+          console.log(bearing);
+        }
       }.bind(this)
     );
   }
