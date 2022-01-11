@@ -18,9 +18,13 @@ export default class NavigateControl {
       if (this.navigating) {
         this._options.startCallback();
         this._btn.className = "mapboxgl-ctrl-icon mapboxgl-ctrl-navigating";
+        this._btn.style.backgroundColor = "#879af9";
+        this.follow();
       } else {
         this._options.stopCallback();
         this._btn.className = "mapboxgl-ctrl-icon mapboxgl-ctrl-not-navigating";
+        this._btn.style.backgroundColor = "";
+        clearInterval(this.intervalID);
       }
     };
 
@@ -29,6 +33,12 @@ export default class NavigateControl {
     this._container.appendChild(this._btn);
 
     return this._container;
+  }
+
+  follow() {
+    this.intervalID = setInterval(() => {
+      this._options.updateCurentMarkerBearing();
+    }, 100);
   }
 
   onRemove() {

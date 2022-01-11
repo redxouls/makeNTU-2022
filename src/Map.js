@@ -12,6 +12,8 @@ import {
   NavigateControl,
 } from "./controls";
 
+import LocationMarker from "./markers/Location.js";
+
 mapboxgl.accessToken =
   "pk.eyJ1IjoicmVkeG91bHMiLCJhIjoiY2t4N2R1Nm1uMHl4aTJwcXViYno1Ym9sNCJ9.fByzZrach_1gQlboB02hCg";
 
@@ -31,7 +33,7 @@ class Map {
       accessToken: mapboxgl.accessToken,
       unit: "metric",
       profile: "mapbox/cycling",
-      interactive: false,
+      interactive: true,
       controls: {
         inputs: true,
         instructions: false,
@@ -47,13 +49,14 @@ class Map {
 
     const coordinates = [121.54373533333333, 25.0190466666666684];
 
-    this.currentMarker = new mapboxgl.Marker()
+    this.currentMarker = new mapboxgl.Marker(LocationMarker())
       .setLngLat(coordinates)
+      .setRotation(0)
       .addTo(this.map);
 
     this.map.addControl(
       new CompassControl({
-        updateCallback: this.updateBearing.bind(this),
+        updateMapBearing: this.updateMapBearing.bind(this),
       }),
       "top-right"
     );
@@ -69,6 +72,7 @@ class Map {
       new NavigateControl({
         startCallback: this.startNavigation.bind(this),
         stopCallback: this.stopNavigation.bind(this),
+        updateCurentMarkerBearing: this.updateCurentMarkerBearing.bind(this),
       }),
       "top-right"
     );
@@ -109,11 +113,14 @@ class Map {
         });
     });
 
-    this.updateCurentMarker();
-    // this.updateCurentBearing();
+    // this.updateCurentMarkerPostion();
+    // this.updateCurentMarkerBearing()
+    // this.updateMapBearing();
+
+    // Add markers to the map.
   }
 
-  updateCurentMarker() {
+  updateCurentMarkerPosition() {
     console.log("update my position");
     const { currentMarker } = this;
     setInterval(
@@ -131,21 +138,23 @@ class Map {
     );
   }
 
-  updateCurentBearing() {
-    console.log("update my bearing");
-    const { map } = this;
-    setInterval(
-      () => {
-        PositionAPI.getCurentBearing().then((response) => {
-          if (response) {
-            const { bearing } = response.data;
-            map.easeTo({ pitch: 0, bearing });
-          }
-        });
-      },
-      100,
-      map
-    );
+  updateCurentMarkerBearing() {
+    PositionAPI.getCurentBearing().then((response) => {
+      console.log(response);
+      if (response) {
+        const { bearing } = response.data;
+        this.currentMarker.setRotation(bearing);
+      }
+    });
+  }
+
+  updateMapBearing() {
+    PositionAPI.getCurentBearing().then((response) => {
+      if (response) {
+        const { bearing } = response.data;
+        this.map.easeTo({ pitch: 0, bearing });
+      }
+    });
   }
 
   updateStartPoint() {

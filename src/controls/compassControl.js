@@ -11,9 +11,17 @@ export default class CompassControl {
     this._btn.className = "mapboxgl-ctrl-icon mapboxgl-ctrl-compass-toggle";
     this._btn.type = "button";
     this._btn["aria-label"] = "Toggle To Update Map Bearing";
+    this.clicked = false;
 
     this._btn.onclick = () => {
-      this._options.updateCallback();
+      this.clicked = !this.clicked;
+      if (this.clicked) {
+        this.follow();
+        this._btn.style.backgroundColor = "darksalmon";
+      } else {
+        clearInterval(this.intervalID);
+        this._btn.style.backgroundColor = "";
+      }
     };
 
     this._container = document.createElement("div");
@@ -21,6 +29,12 @@ export default class CompassControl {
     this._container.appendChild(this._btn);
 
     return this._container;
+  }
+
+  follow() {
+    this.intervalID = setInterval(() => {
+      this._options.updateMapBearing();
+    }, 100);
   }
 
   onRemove() {
