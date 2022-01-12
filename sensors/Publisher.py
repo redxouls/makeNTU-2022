@@ -11,6 +11,7 @@ class Publisher():
     def __init__(self, args):
         self.port = args["port"]
         self.ip = args["ip"]
+        self.topics = args["topic"]
         self.client = mqtt.Client()
 
     def publish(self, topic, data):
@@ -44,11 +45,12 @@ class Publisher():
         
         # Intervally send topic message
         try:
-            t1 = threading.Thread(target=self.gps_sensor)
-            t1.start()
-        
-            # t2 = threading.Thread(target=self.compass_sensor)
-            # t2.start()
+            if 'gps' in self.topics:
+                t1 = threading.Thread(target=self.gps_sensor)
+                t1.start()
+            if 'compass' in self.topics:
+                t2 = threading.Thread(target=self.compass_sensor)
+                t2.start()
         
         except KeyboardInterrupt as e:
             gps_close()
@@ -65,7 +67,11 @@ if __name__ == "__main__":
                         default=1883,
                         type=int,
                         help="service port of MQTT broker")
-    
+    parser.add_argument("--topic",
+                        default="gps",
+                        choices=['gps', 'compass'],
+                        nargs="+",
+                        help="Availabel information to publish")
     args = vars(parser.parse_args())
     publisher = Publisher(args)
     publisher.main()
