@@ -37,7 +37,7 @@ export default class NavigateControl {
 
   follow() {
     this.intervalID = setInterval(() => {
-      this._options.updateCurentMarkerBearing();
+      this._options.updateMapBearing();
     }, 100);
   }
 

@@ -56,7 +56,7 @@ class Map {
 
     this.map.addControl(
       new CompassControl({
-        updateMapBearing: this.updateMapBearing.bind(this),
+        updateCurentMarkerBearing: this.updateCurentMarkerBearing.bind(this),
       }),
       "top-right"
     );
@@ -72,7 +72,7 @@ class Map {
       new NavigateControl({
         startCallback: this.startNavigation.bind(this),
         stopCallback: this.stopNavigation.bind(this),
-        updateCurentMarkerBearing: this.updateCurentMarkerBearing.bind(this),
+        updateMapBearing: this.updateMapBearing.bind(this),
       }),
       "top-right"
     );
