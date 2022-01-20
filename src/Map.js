@@ -10,6 +10,7 @@ import {
   PitchControl,
   CompassControl,
   NavigateControl,
+  CameraControl
 } from "./controls";
 
 import LocationMarker from "./markers/Location.js";
@@ -95,6 +96,10 @@ class Map {
           console.log(myJson);
         });
     });
+
+    this.map.addControl(new CameraControl({
+
+    }));
 
     this.directions.on("destination", (e) => {
       console.log(e.feature.geometry.coordinates);

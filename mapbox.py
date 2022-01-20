@@ -52,6 +52,13 @@ def current(mode):
         }
     return jsonify(data)
 
+@app.route("/api/records/<mode>", methods=['GET'])
+def record_get(mode):
+    if mode == "0":
+        # data = {"status": 200}
+        # return send_from_directory('./camera/test.flv')
+        return send_from_directory('./camera', 'test.html')
+
 # Serve React App
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')

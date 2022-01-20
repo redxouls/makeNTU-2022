@@ -6,8 +6,7 @@ from datetime import datetime
 def gstreamer_rtmpstream(queue):
     now = datetime.now()
     filename = now.strftime("%d-%m-%Y_%H-%M-%S") + ".flv"
-    
-    
+      
     pipeline = (
         "appsrc ! "
             "video/x-raw, format=(string)BGR ! "
@@ -18,7 +17,7 @@ def gstreamer_rtmpstream(queue):
             "nvv4l2h264enc ! "
             "h264parse ! "
             "flvmux ! "
-            "udpsink host=127.0.0.1 port=5000 ! "
+            'rtmpsink location="rtmp://localhost/rtmp/live live=1"'
         )
     file_pipeline = (
         "appsrc ! "

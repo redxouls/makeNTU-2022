@@ -7,27 +7,44 @@ class Navigator:
     def __init__(self, origin=[121.543764, 25.019388], destination=[121.534337, 25.019064], serial_port=None, subscriber=None):
         self.origin = origin
         self.destination = destination
-        self.serial_port = serial_port
+        self.serial_port = serial.Serial(
+            port="/dev/ttyACM0",
+            baudrate=115200,
+            bytesize=serial.EIGHTBITS,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE,
+        )
         self.subscriber = subscriber
         self.started = False
     
     def get_route(self):
         o_long, o_lat = self.origin
         d_long, d_lat = self.destination
-        # origin_destination = "%6f,%6f;%6f,%6f" % (o_long, o_lat, d_long, d_lat)
-        
-        url = "https://api.mapbox.com/directions/v5/mapbox/cycling/%6f,%6f;%6f,%6f?alternatives=false&continue_straight=true&geometries=geojson&language=en&overview=simplified&steps=true&access_token=pk.eyJ1IjoicmVkeG91bHMiLCJhIjoiY2t4N2R1Nm1uMHl4aTJwcXViYno1Ym9sNCJ9.fByzZrach_1gQlboB02hCg" % (o_long, o_lat, d_long, d_lat)
 
+        url = "https://api.mapbox.com/directions/v5/mapbox/cycling/%6f,%6f;%6f,%6f?alternatives=false&continue_straight=true&geometries=geojson&language=en&overview=simplified&steps=true&access_token=pk.eyJ1IjoicmVkeG91bHMiLCJhIjoiY2t4N2R1Nm1uMHl4aTJwcXViYno1Ym9sNCJ9.fByzZrach_1gQlboB02hCg" % (o_long, o_lat, d_long, d_lat)
         res = requests.get(url)
         routes = res.json().get('routes')[0]
+
+        # with open("routes.json", "r") as f:
+        #     routes = json.loads(f.read()).get('routes')[0]
+
         steps = routes.get('legs')[0].get('steps')
-        
+        # print(steps)
+        self.mode = "straight"
         for step in steps:
-            step_type = step.get('maneuver').get('type')
-            print(step_type)
-            if step_type == "turn":
-                print(step.get('maneuver').get('modifier'))
-                return step.get('maneuver').get('modifier')
+            maneuver =  step.get('maneuver')
+            step_type = maneuver.get('type')
+            duration = step.get('duration')
+            if step_type == 'depart':
+                print(step_type, duration)
+                if duration > 15:
+                    self.mode = "straight"
+                    return 
+            if step_type == 'turn':
+                modifier = maneuver.get('modifier')
+                print(step_type, modifier)
+                self.mode = modifier
+                return
 
     def setOrigin(self, origin):
         self.origin = origin
@@ -40,13 +57,33 @@ class Navigator:
         while self.started:
             newOrigin = self.subscriber.data.get("gps", [121.543764, 25.019388])
             self.setOrigin(newOrigin)
-            direction = self.get_route()
+            self.get_route()
             if self.serial_port:
-                if "left" in direction:
-                    self.serial_port.write(b"L")
-                elif "right" in direction:
-                    self.serial_port.write(b"R")
-            
+                if self.mode == "left":
+                    self.serial_port.write(b"1")
+                    time.sleep(1)
+                    self.serial_port.write(b"6")
+
+                elif self.mode == "slight left":
+                    self.serial_port.write(b"2")
+                    time.sleep(1)
+                    self.serial_port.write(b"7")
+
+                elif self.mode == "straight":
+                    self.serial_port.write(b"3")
+                    time.sleep(1)
+                    self.serial_port.write(b"8")
+                
+                elif self.mode == "slight right":
+                    self.serial_port.write(b"4")
+                    time.sleep(1)
+                    self.serial_port.write(b"9")
+                
+                elif self.mode == "right":
+                    self.serial_port.write(b"5")
+                    time.sleep(1)
+                    self.serial_port.write(b"0")
+                print(self.mode)
             time.sleep(1)
 
     def stop(self):
