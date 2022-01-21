@@ -4,13 +4,21 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 from sensors.Subscriber import Subscriber
 from controller.Navigator import Navigator
 
+from sensors.Publisher import Publisher
+
 app = Flask(__name__, static_folder="build", template_folder="build")
 
-subscriber = Subscriber()
-navigator =  Navigator(subscriber=subscriber)
 
-t = threading.Thread(target=subscriber.main)
-t.start()
+publisher = Publisher()
+t_publisher = threading.Thread(target=publisher.main)
+t_publisher.start()
+
+subscriber = Subscriber()
+stm_serial = Publisher.get_stm_serial()
+navigator =  Navigator(subscriber=subscriber, serial_port=stm_serial)
+
+t_subscriber = threading.Thread(target=subscriber.main)
+t_subscriber.start()
 
 @app.route("/api/navigate", methods=['POST'])
 def navigate_post():

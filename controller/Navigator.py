@@ -7,13 +7,7 @@ class Navigator:
     def __init__(self, origin=[121.543764, 25.019388], destination=[121.534337, 25.019064], serial_port=None, subscriber=None):
         self.origin = origin
         self.destination = destination
-        self.serial_port = serial.Serial(
-            port="/dev/ttyACM0",
-            baudrate=115200,
-            bytesize=serial.EIGHTBITS,
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE,
-        )
+        self.serial_port = serial_port
         self.subscriber = subscriber
         self.started = False
     
@@ -37,7 +31,7 @@ class Navigator:
             duration = step.get('duration')
             if step_type == 'depart':
                 print(step_type, duration)
-                if duration > 15:
+                if duration > 10:
                     self.mode = "straight"
                     return 
             if step_type == 'turn':

@@ -3,16 +3,23 @@ import json
 
 import paho.mqtt.client as mqtt
 
-from GPS import gps_read, gps_close
-from Compass import compass_read, compass_close
+from .GPS import gps_read, gps_close
+from .Compass import compass_read, compass_close, get_stm_serial
 
 
 class Publisher():
-    def __init__(self, args):
-        self.port = args["port"]
-        self.ip = args["ip"]
-        self.topics = args["topic"]
+    def __init__(self, args=None):
+        if args:
+            self.port = args["port"]
+            self.ip = args["ip"]
+            self.topics = args["topic"]
+        else:
+            self.port = 1883
+            self.ip = "localhost"
+            self.topics = ['gps', 'compass']
+        
         self.client = mqtt.Client()
+        
 
     def publish(self, topic, data):
         payload = json.dumps(data).encode()
@@ -36,8 +43,10 @@ class Publisher():
                 continue
             self.publish("compass", data)
             time.sleep(0.05)
-
-        
+    @staticmethod
+    def get_stm_serial():
+        return get_stm_serial()
+    
     def main(self):
         # Establish connection to mqtt broker
         self.client.connect(host=self.ip, port=self.port)
@@ -56,6 +65,7 @@ class Publisher():
             gps_close()
             compass_close()
             self.client.loop_stop()
+
 
 
 if __name__ == "__main__":

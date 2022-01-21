@@ -63,6 +63,9 @@ def compass_read():
 def compass_close():
     serial_port.close()
 
+def get_stm_serial():
+    return serial_port
+
 if __name__ == "__main__":
     while True:
         compass_read()
