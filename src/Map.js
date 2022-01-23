@@ -10,7 +10,7 @@ import {
   PitchControl,
   CompassControl,
   NavigateControl,
-  CameraControl
+  CameraControl,
 } from "./controls";
 
 import LocationMarker from "./markers/Location.js";
@@ -97,9 +97,7 @@ class Map {
         });
     });
 
-    this.map.addControl(new CameraControl({
-
-    }));
+    this.map.addControl(new CameraControl({}));
 
     this.directions.on("destination", (e) => {
       console.log(e.feature.geometry.coordinates);
@@ -118,7 +116,7 @@ class Map {
         });
     });
 
-    // this.updateCurentMarkerPostion();
+    this.updateCurentMarkerPostion();
     // this.updateCurentMarkerBearing()
     // this.updateMapBearing();
 
@@ -130,7 +128,7 @@ class Map {
     const { currentMarker } = this;
     setInterval(
       () => {
-        PositionAPI.getCurentPosition().then((response) => {
+        PositionAPI.getCurrentPosition().then((response) => {
           console.log(response);
           if (response) {
             const { coordinates } = response.data;
