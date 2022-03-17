@@ -11,15 +11,21 @@ $ pip3 install -r requirements.txt
 **Install npm packages**
 
 ```bash
-$ npm install
+$ yarn
 ```
 
 ## How to run
 
+**Development**
+
+```bash
+$ yarn start
+```
+
 **Build the frontend first**
 
 ```bash
-$ npm run build
+$ yarn build
 ```
 
 **Start mqtt broker**
