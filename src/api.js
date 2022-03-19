@@ -5,11 +5,9 @@ const errorHandling = (error) => {
   console.log(error);
 };
 
-export const PositionAPI = {
-  getCurentPosition: () =>
-    axios.get(`/api/current/location`).catch((error) => errorHandling(error)),
-  getCurentBearing: () =>
-    axios.get(`/api/current/bearing`).catch((error) => errorHandling(error)),
+export const StreetAPI = {
+  getAllStreetlights: () =>
+    axios.get(`/api/allStreetlights`).catch((error) => errorHandling(error)),
   postNavigation: (data) =>
     axios
       .post(`/api/navigate`, JSON.stringify(data), {
@@ -18,8 +16,4 @@ export const PositionAPI = {
         },
       })
       .catch((error) => errorHandling(error)),
-  startNavigation: () =>
-    axios.get(`/api/navigate/start`).catch((error) => errorHandling(error)),
-  stopNavigation: () =>
-    axios.get(`/api/navigate/stop`).catch((error) => errorHandling(error)),
 };

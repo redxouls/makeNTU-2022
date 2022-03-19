@@ -1,0 +1,38 @@
+[
+  {
+    "type": "Feature",
+    "properties": {
+      "index": 0,
+      "name": "StreetLight_0",
+      "iconSize": [70, 70]
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [121.54629, 25.01904]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "index": 1,
+      "name": "StreetLight_1",
+      "iconSize": [70, 70]
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [121.54575, 25.01862]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "index": 2,
+      "name": "StreetLight_2",
+      "iconSize": [70, 70]
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [121.54511, 25.01809]
+    }
+  }
+]

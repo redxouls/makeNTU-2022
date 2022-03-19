@@ -3,6 +3,14 @@ import { resolve } from "path";
 import fs from "fs/promises";
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:6000",
+        changeOrigin: true,
+      },
+    },
+  },
   resolve: {
     alias: {
       src: resolve(__dirname, "src"),

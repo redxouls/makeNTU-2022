@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
 
-import Map from "./Map.js";
+import Map from "./components/Map.js";
 
 const App = () => {
   const mapRef = useRef(null);
