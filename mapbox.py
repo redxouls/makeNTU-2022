@@ -3,12 +3,23 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+fall = {}
+
 @app.route("/api/allStreetlights", methods=['GET'])
 def home():
     with open("config.json", 'r') as f:
         data = json.load(f)
 
     return jsonify(data)
+
+
+@app.route("/api/fall", methods=['POST'])
+def fall():
+    global fall
+    received_data = request.form
+    print(received_data)
+    
+    return jsonify(received_data)
 
 
 # Serve React App
