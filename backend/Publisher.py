@@ -18,14 +18,14 @@ class Publisher():
         
 
     def publish(self, topic, data):
+        # Establish connection to mqtt broker
+        self.client.connect(host=self.ip, port=self.port)
+        self.client.loop_start()
         payload = json.dumps(data).encode()
         self.client.publish(topic=topic, payload=payload)
 
     
     def main(self):
-        # Establish connection to mqtt broker
-        self.client.connect(host=self.ip, port=self.port)
-        self.client.loop_start()
         
         # Intervally send topic message
         try:
@@ -57,7 +57,7 @@ if __name__ == "__main__":
                         default="brightness",
                         choices=['brightness'],
                         nargs="+",
-                        help="Availabel information to publish")
+                        help="Available information to publish")
     args = vars(parser.parse_args())
     publisher = Publisher(args)
     publisher.main()
