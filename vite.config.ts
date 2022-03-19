@@ -9,6 +9,11 @@ export default defineConfig({
         target: "http://127.0.0.1:6000",
         changeOrigin: true,
       },
+      "/video": {
+        target: "http://172.20.10.2:8080",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/video/, ""),
+      },
     },
   },
   resolve: {

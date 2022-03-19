@@ -12,7 +12,7 @@ mapboxgl.accessToken =
   "pk.eyJ1IjoicmVkeG91bHMiLCJhIjoiY2t4N2R1Nm1uMHl4aTJwcXViYno1Ym9sNCJ9.fByzZrach_1gQlboB02hCg";
 
 class Map {
-  constructor(ref) {
+  constructor(ref, handlers) {
     this.navigating = false;
     this.container = ref;
     this.map = new mapboxgl.Map({
@@ -31,13 +31,14 @@ class Map {
       console.log(geojson);
       for (const marker of geojson) {
         // Create a DOM element for each marker.
-        const { el } = new StreetLampMarker(marker);
+        const { el } = new StreetLampMarker(marker, handlers.handleShowDetail);
         // Add markers to the map.
         new mapboxgl.Marker(el)
           .setLngLat(marker.geometry.coordinates)
           .addTo(this.map);
       }
     });
+
     // Add markers to the map.
   }
 }

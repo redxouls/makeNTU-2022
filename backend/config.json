@@ -3,7 +3,7 @@
     "type": "Feature",
     "properties": {
       "index": 0,
-      "name": "StreetLight_0",
+      "name": "Street Light 0",
       "iconSize": [70, 70]
     },
     "geometry": {
@@ -15,7 +15,7 @@
     "type": "Feature",
     "properties": {
       "index": 1,
-      "name": "StreetLight_1",
+      "name": "Street Light 1",
       "iconSize": [70, 70]
     },
     "geometry": {
@@ -27,7 +27,7 @@
     "type": "Feature",
     "properties": {
       "index": 2,
-      "name": "StreetLight_2",
+      "name": "Street Light 2",
       "iconSize": [70, 70]
     },
     "geometry": {

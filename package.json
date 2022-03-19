@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.8.2",
+    "@emotion/styled": "^11.8.1",
     "@mapbox/mapbox-gl-directions": "^4.0.3",
+    "@mui/icons-material": "^5.5.1",
+    "@mui/material": "^5.5.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
@@ -13,6 +17,9 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
+    "recharts": "^2.1.9",
+    "rsuite": "^5.6.5",
+    "video.js": "^7.18.1",
     "vite": "^2.8.6",
     "vite-plugin-svgr": "^1.0.1"
   },
