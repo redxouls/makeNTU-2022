@@ -42,25 +42,25 @@ class Light_controller:
                 self.payload[i]['flash'] = True
     
     def update(self, publisher, lock):
-        # print("updating")
-        if self.fall_warning:
-            if time.time() - self.warning_timer > self.warning_period:
-                self.fall_warning = False
-                print("Fall alarm stopped")
+        while(1):
+            if self.fall_warning:
+                if time.time() - self.warning_timer > self.warning_period:
+                    self.fall_warning = False
+                    print("Fall alarm stopped")
+                    for i in range(self.num_lights):
+                        lock.acquire()
+                        self.payload[i]['brightness'] = self.default_light['brightness']
+                        self.payload[i]['color'] = self.default_light['color']
+                        self.payload[i]['flash'] = self.default_light['flash']
+                        lock.release()
+            else:
                 for i in range(self.num_lights):
-                    lock.acquire()
-                    self.payload[i]['brightness'] = self.default_light['brightness']
-                    self.payload[i]['color'] = self.default_light['color']
-                    self.payload[i]['flash'] = self.default_light['flash']
-                    lock.release()
-        else:
-            for i in range(self.num_lights):
-                if time.time() - self.lumos_timer[i] > self.lumos_period:
-                    lock.acquire()
-                    self.payload[i]['brightness'] = self.default_light['brightness']
-                    lock.release()
-        publisher.publish('lights', self.payload)
-        time.sleep(0.1)
+                    if time.time() - self.lumos_timer[i] > self.lumos_period:
+                        lock.acquire()
+                        self.payload[i]['brightness'] = self.default_light['brightness']
+                        lock.release()
+            publisher.publish('lights', self.payload)
+            time.sleep(1)
 
 light_controller = Light_controller(8)
 
@@ -106,8 +106,6 @@ def sensor():
 #         return render_template('index.html')
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=6000, debug=True)
-
     parser = argparse.ArgumentParser()
     parser.add_argument("--ip",
                         default="localhost",
@@ -116,7 +114,7 @@ if __name__ == "__main__":
                         default=1883,
                         type=int,
                         help="service port of MQTT broker")
-    args = parser.parse_args()
+    args = vars(parser.parse_args())
     print("Create publisher and subscriber")
     publisher = Publisher(args)
     subscriber = Subscriber(args)
@@ -126,8 +124,11 @@ if __name__ == "__main__":
     t_subscriber = threading.Thread(target = subscriber.main)
     t_subscriber.start()
 
-    t_update = threading.Thread(target = light_controller.update, args=(lock,))
+    t_update = threading.Thread(target = light_controller.update, args=(publisher, lock,))
     t_update.start()
+
+
+    app.run(host="0.0.0.0", port=6000, debug=True)
 
     t_subscriber.join()
     t_update.join()

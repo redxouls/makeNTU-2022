@@ -4,6 +4,7 @@ import paho.mqtt.client as mqtt
 class Subscriber():
     def __init__(self, args=None):
         self.client = mqtt.Client()
+        self.topic_list = ["brightness", "sensor"]
         self.data = {
             "brightness": {
                 "to": 1,
@@ -14,7 +15,8 @@ class Subscriber():
         self.port = args.get("port", 1883)
 
     def on_message(self, client, obj, msg):
-        self.data[msg.topic] = json.loads(msg.payload.decode())
+        if msg.topic in self.topic_list:
+            self.data[msg.topic] = json.loads(msg.payload.decode())
         print(f"TOPIC: {msg.topic}, VALUE: {msg.payload}")
         
 
@@ -22,8 +24,10 @@ class Subscriber():
         # Establish connection to mqtt broker
         self.client.on_message = self.on_message
         self.client.connect(host=self.ip, port=self.port)
-        self.client.subscribe('brightness', 0)
-        self.client.subscribe('sensor', 0)
+        for t in self.topic_list:
+            self.client.subscribe(t, 0)
+
+        # self.client.subscribe('lights', 0)
 
         try:
             self.client.loop_forever()

@@ -8,11 +8,11 @@ class Publisher():
         if args:
             self.port = args["port"]
             self.ip = args["ip"]
-            self.topics = args["topic"]
+            # self.topics = args["topic"]
         else:
             self.port = 1883
             self.ip = "localhost"
-            self.topics = ['brightness']
+            # self.topics = ['brightness']
         
         self.client = mqtt.Client()
         
@@ -20,7 +20,6 @@ class Publisher():
     def publish(self, topic, data):
         # Establish connection to mqtt broker
         self.client.connect(host=self.ip, port=self.port)
-        self.client.loop_start()
         payload = json.dumps(data).encode()
         self.client.publish(topic=topic, payload=payload)
     
@@ -29,14 +28,14 @@ class Publisher():
         # Intervally send topic message
         try:
             while True:
-                if 'brightness' in self.topics:
-                    payload = {
-                        "to": 1,
-                        "value": 10
-                    }
-                    self.publish("brightness", payload)
-                    print("Payload send: %s" % str(payload))
-                    time.sleep(1)
+                # if 'brightness' in self.topics:
+                payload = {
+                    "to": 1,
+                    "value": 10
+                }
+                self.publish("brightness", payload)
+                print("Payload send: %s" % str(payload))
+                time.sleep(1)
         
         except KeyboardInterrupt as e:
             self.client.loop_stop()
