@@ -23,6 +23,7 @@ class Subscriber():
         self.client.on_message = self.on_message
         self.client.connect(host=self.ip, port=self.port)
         self.client.subscribe('brightness', 0)
+        self.client.subscribe('sensor', 0)
 
         try:
             self.client.loop_forever()
