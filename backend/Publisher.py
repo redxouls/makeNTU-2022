@@ -23,7 +23,6 @@ class Publisher():
         self.client.loop_start()
         payload = json.dumps(data).encode()
         self.client.publish(topic=topic, payload=payload)
-
     
     def main(self):
         
