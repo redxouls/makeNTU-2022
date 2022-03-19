@@ -6,51 +6,63 @@ from Publisher import Publisher
 from Subscriber import Subscriber
 
 app = Flask(__name__)
-fall_warning = False
-warning_timer = time.time()
-warning_period = 5
-lumos_timer = [time.time() for i in range(8)]
-lumos_period = 5
-lumos_range = 2
 
-payload = [{
-        'id':i,
-        'brightness':128,
-        'color':'w',
-        'flash': False
-    } for i in range(8)]
+class Light_controller:
+    def __init__(self, num_lights=8) -> None:
+        self.num_lights = num_lights
+        self.fall_warning = False
+        self.warning_timer = time.time()
+        self.warning_period = 5
+        self.lumos_timer = [time.time() for i in range(8)]
+        self.lumos_period = 5
+        self.lumos_range = 2
+        self.payload = [{
+                            'id':i,
+                            'brightness':128,
+                            'color':'w',
+                            'flash': False
+                        } for i in range(self.num_lights)]
+        self.default_light = {
+                            'brightness':128,
+                            'color':'w',
+                            'flash': False
+                        }
+    def lumos(self, index, brightness=255):
+        for i in range( max(0, index - self.lumos_range), min(self.num_lights, index + self.lumos_range) ):
+            self.payload[i]['brightness'] = brightness
+            self.lumos_timer[i] = time.time()
+    def fall(self, prob):
+        if prob > 0.2:
+            print("[Fall detected!]")
+            self.fall_warning = True
+            self.warning_timer = time.time()
+            for i in range(self.num_lights):
+                self.payload[i]['brightness'] = 255
+                self.payload[i]['color'] = 'r'
+                self.payload[i]['flash'] = True
+    
+    def update(self, publisher, lock):
+        # print("updating")
+        if self.fall_warning:
+            if time.time() - self.warning_timer > self.warning_period:
+                self.fall_warning = False
+                print("Fall alarm stopped")
+                for i in range(self.num_lights):
+                    lock.acquire()
+                    self.payload[i]['brightness'] = self.default_light['brightness']
+                    self.payload[i]['color'] = self.default_light['color']
+                    self.payload[i]['flash'] = self.default_light['flash']
+                    lock.release()
+        else:
+            for i in range(self.num_lights):
+                if time.time() - self.lumos_timer[i] > self.lumos_period:
+                    lock.acquire()
+                    self.payload[i]['brightness'] = self.default_light['brightness']
+                    lock.release()
+        publisher.publish('lights', self.payload)
+        time.sleep(0.1)
 
-default_light = {
-        'brightness':128,
-        'color':'w',
-        'flash': False
-    }
-
-def lumos(index, brightness=255):
-    global payload, lumos_range, lumos_timer
-    for i in range( max(0, index - lumos_range), min(8, index + lumos_range) ):
-        payload[i]['brightness'] = brightness
-        lumos_timer = time.time()
-
-def update(publisher, lock):
-    global payload, lumos_timer, lumos_period, default_light, fall_warning, warning_period, warning_timer
-    if fall_warning:
-        if time.time() - warning_timer > warning_period:
-            fall_warning = False
-            for i in range(8):
-                lock.acquire()
-                payload[i]['brightness'] = default_light['brightness']
-                payload[i]['color'] = default_light['color']
-                payload[i]['flash'] = default_light['flash']
-                lock.release()
-    else:
-        for i in range(8):
-            if time.time() - lumos_timer[i] > lumos_period:
-                lock.acquire()
-                payload[i]['brightness'] = default_light['brightness']
-                lock.release()
-    publisher.publish('lights', payload)
-    time.sleep(0.1)
+light_controller = Light_controller(8)
 
 @app.route("/api/allStreetlights", methods=['GET'])
 def home():
@@ -62,28 +74,23 @@ def home():
 
 @app.route("/api/fall", methods=['POST'])
 def fall():
-    global fall_warning, payload, warning_timer
     received_data = request.form
     # received_data = {
     #     "from": 2,
     #     "probability": 0.1
     # }
-    if received_data.get('probability') > 0.2:
-        fall_warning = True
-        warning_timer = time.time()
-        for i in range(8):
-            payload[i]['brightness'] = 255
-            payload[i]['color'] = 'r'
-            payload[i]['flash'] = True
-
-    # return jsonify(received_data)
+    prob = float(received_data.get('probability')) 
+    light_controller.fall(prob)
+    return jsonify(received_data)
 
 @app.route("/api/obj_passed", methods=['POST'])
 def obj_passed():
     received_data = request.form
-    lumos(received_data.get('from'))
+    index = int(received_data.get('from'))
+    print("[Lamp ", index, " triggered]")
+    light_controller.lumos(index)
 
-    # return jsonify(received_data)
+    return jsonify(received_data)
 
 @app.route("/api/allSensors", methods=['GET'])
 def sensor():
@@ -110,6 +117,7 @@ if __name__ == "__main__":
                         type=int,
                         help="service port of MQTT broker")
     args = parser.parse_args()
+    print("Create publisher and subscriber")
     publisher = Publisher(args)
     subscriber = Subscriber(args)
 
@@ -118,7 +126,7 @@ if __name__ == "__main__":
     t_subscriber = threading.Thread(target = subscriber.main)
     t_subscriber.start()
 
-    t_update = threading.Thread(target = update, args=(lock,))
+    t_update = threading.Thread(target = light_controller.update, args=(lock,))
     t_update.start()
 
     t_subscriber.join()
