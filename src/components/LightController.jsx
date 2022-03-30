@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import Slider from "@mui/material/Slider";
+import { _ } from "lodash";
 
-import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
+import { StreetAPI } from "../api";
 
 import "./LightController.css";
 
-const LightController = () => {
+const LightController = (props) => {
   const marks = [
     {
       value: 0,
@@ -32,6 +33,7 @@ const LightController = () => {
   function valuetext(value) {
     return <h5>{`${value}%`}</h5>;
   }
+
   return (
     <Slider
       aria-label="Always visible"
@@ -41,6 +43,15 @@ const LightController = () => {
       marks={marks}
       valueLabelDisplay="on"
       style={{ color: "#91a7eb" }}
+      onChange={_.throttle((e) => {
+        const payload = {
+          to: props.state.index,
+          brightness: e.target.value,
+        };
+        StreetAPI.postBrightness(payload).then((response) => {
+          console.log(response);
+        });
+      }, 100)}
     />
   );
 };

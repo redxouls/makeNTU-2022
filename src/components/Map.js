@@ -19,7 +19,7 @@ class Map {
       container: this.container,
       style: "mapbox://styles/mapbox/dark-v9",
       center: [121.54591, 25.01876],
-      zoom: 18,
+      zoom: 17,
       pitch: 60, // pitch in degrees
     });
 

@@ -28,7 +28,7 @@ class Subscriber():
                 })
                 if len(self.data[msg_from][msg_type]) > self.data_limit:
                     self.data[msg_from][msg_type].pop(0)
-        # print(f"TOPIC: {msg.topic}, VALUE: {msg.payload}")
+        print(f"TOPIC: {msg.topic}, VALUE: {msg.payload}")
         
 
     def main(self):

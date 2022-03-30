@@ -3,7 +3,7 @@
     "type": "Feature",
     "properties": {
       "index": 0,
-      "name": "Street Light 0",
+      "name": "Street Light #0",
       "iconSize": [70, 70]
     },
     "geometry": {
@@ -15,7 +15,7 @@
     "type": "Feature",
     "properties": {
       "index": 1,
-      "name": "Street Light 1",
+      "name": "Street Light #1",
       "iconSize": [70, 70]
     },
     "geometry": {
@@ -27,12 +27,24 @@
     "type": "Feature",
     "properties": {
       "index": 2,
-      "name": "Street Light 2",
+      "name": "Street Light #2",
       "iconSize": [70, 70]
     },
     "geometry": {
       "type": "Point",
       "coordinates": [121.54511, 25.01809]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "index": 3,
+      "name": "Street Light #3",
+      "iconSize": [70, 70]
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [121.5446, 25.01756]
     }
   }
 ]

@@ -1,4 +1,4 @@
-import argparse, threading, time
+import argparse, threading, time, random
 import json
 
 import paho.mqtt.client as mqtt
@@ -22,20 +22,48 @@ class Publisher():
         self.client.connect(host=self.ip, port=self.port)
         payload = json.dumps(data).encode()
         self.client.publish(topic=topic, payload=payload)
+        
     
     def main(self):
-        
+        index = 0
         # Intervally send topic message
         try:
             while True:
-                # if 'brightness' in self.topics:
-                payload = {
-                    "to": 1,
-                    "value": 10
-                }
-                self.publish("brightness", payload)
-                print("Payload send: %s" % str(payload))
+                if (index %2 == 0):
+                    # if 'brightness' in self.topics:
+                    payloads = [
+                    {
+                        "from": 1,
+                        "data": 28 + random.random()*0.2,
+                        "type": "temperature"
+                    },
+                    {
+                        "from": 1,
+                        "data": 8 + random.random()*0.6,
+                        "type": "humidity"
+                    },
+                    ]
+                else :
+                    payloads = [
+                    {
+                        "from": 1,
+                        "data": 27 + random.random()*1.4,
+                        "type": "temperature"
+                    },
+                    {
+                        "from": 1,
+                        "data": 8 + random.random()*0.4,
+                        "type": "humidity"
+                    },
+                    ]
+                for payload in payloads:
+                    self.publish("sensor", payload)
+                    print("Payload send: %s" % str(payload))
+                # payload = {"to": 1, "brightness": 32}
+                # self.publish("lights", payload)
+                # print("Payload send: %s" % str(payload))
                 time.sleep(1)
+                index += 1
         
         except KeyboardInterrupt as e:
             self.client.loop_stop()

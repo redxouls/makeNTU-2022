@@ -13,6 +13,8 @@
     "@testing-library/user-event": "^7.2.1",
     "@vitejs/plugin-react-refresh": "^1.3.6",
     "axios": "^0.24.0",
+    "colormap": "^2.3.2",
+    "lodash": "^4.17.21",
     "mapbox-gl": "^1.10.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
@@ -43,5 +45,13 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "proxy": {
+    "/api": {
+      "target": "http://localhost:6000/api"
+    },
+    "/video": {
+      "target": "http://192.168.29.27:8080"
+    }
   }
 }

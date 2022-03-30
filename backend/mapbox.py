@@ -4,88 +4,38 @@ import os, json, argparse, threading, time
 from flask import Flask, request, jsonify
 from Publisher import Publisher
 from Subscriber import Subscriber
-
+from LightController import LightController
 app = Flask(__name__)
 
-class Light_controller:
-    def __init__(self, num_lights=8) -> None:
-        self.num_lights = num_lights
-        self.fall_warning = False
-        self.warning_timer = time.time()
-        self.warning_period = 5
-        self.lumos_timer = [time.time() for i in range(8)]
-        self.lumos_period = 5
-        self.lumos_range = 2
-        self.payload = [{
-                            'id':i,
-                            'brightness':128,
-                            'color':'w',
-                            'flash': False
-                        } for i in range(self.num_lights)]
-        self.default_light = {
-                            'brightness':128,
-                            'color':'w',
-                            'flash': False
-                        }
-    def lumos(self, index, brightness=255):
-        for i in range( max(0, index - self.lumos_range), min(self.num_lights, index + self.lumos_range) ):
-            self.payload[i]['brightness'] = brightness
-            self.lumos_timer[i] = time.time()
-    def fall(self, prob):
-        if prob > 0.2:
-            print("[Fall detected!]")
-            self.fall_warning = True
-            self.warning_timer = time.time()
-            for i in range(self.num_lights):
-                self.payload[i]['brightness'] = 255
-                self.payload[i]['color'] = 'r'
-                self.payload[i]['flash'] = True
-    
-    def update(self, publisher, lock):
-        while(1):
-            if self.fall_warning:
-                if time.time() - self.warning_timer > self.warning_period:
-                    self.fall_warning = False
-                    print("Fall alarm stopped")
-                    for i in range(self.num_lights):
-                        lock.acquire()
-                        self.payload[i]['brightness'] = self.default_light['brightness']
-                        self.payload[i]['color'] = self.default_light['color']
-                        self.payload[i]['flash'] = self.default_light['flash']
-                        lock.release()
-            else:
-                for i in range(self.num_lights):
-                    if time.time() - self.lumos_timer[i] > self.lumos_period:
-                        lock.acquire()
-                        self.payload[i]['brightness'] = self.default_light['brightness']
-                        lock.release()
-            publisher.publish('lights', self.payload)
-            time.sleep(1)
-
-light_controller = Light_controller(8)
 
 @app.route("/api/allStreetlights", methods=['GET'])
-def home():
+def allStreetlights():
     with open("config.json", 'r') as f:
         data = json.load(f)
 
     return jsonify(data)
 
+@app.route("/api/brightness", methods=['POST'])
+def brightness():
+    received_data = request.json
+    index = received_data.get('to', 255)
+    brightness  = received_data.get('brightness', 255)
+    light_controller.change_brightness(index, brightness)
+    
+    return jsonify(request.json)
+
 
 @app.route("/api/fall", methods=['POST'])
 def fall():
-    received_data = request.form
-    # received_data = {
-    #     "from": 2,
-    #     "probability": 0.1
-    # }
+    received_data = request.json
     prob = float(received_data.get('probability')) 
-    light_controller.fall(prob)
+    index = received_data.get('from')
+    light_controller.fall(index, prob)
     return jsonify(received_data)
 
 @app.route("/api/obj_passed", methods=['POST'])
 def obj_passed():
-    received_data = request.form
+    received_data = request.json
     index = int(received_data.get('from'))
     print("[Lamp ", index, " triggered]")
     light_controller.lumos(index)
@@ -93,9 +43,17 @@ def obj_passed():
     return jsonify(received_data)
 
 @app.route("/api/allSensors", methods=['GET'])
-def sensor():
-    return subscriber.data
+def allSensors():
+    return jsonify(subscriber.data)
 
+@app.route("/api/sensor/<index>", methods=['GET'])
+def sensor(index):
+    return jsonify(subscriber.data.get(int(index), []))
+
+
+@app.route("/api/fall_alarm", methods=['GET'])
+def fall_alarm():
+    return jsonify(light_controller.getStatus())
 # Serve React App
 # @app.route('/', defaults={'path': ''})
 # @app.route('/<path:path>')
@@ -116,15 +74,15 @@ if __name__ == "__main__":
                         help="service port of MQTT broker")
     args = vars(parser.parse_args())
     print("Create publisher and subscriber")
+    
     publisher = Publisher(args)
     subscriber = Subscriber(args)
-
-    lock = threading.Lock()
+    light_controller = LightController(8)
 
     t_subscriber = threading.Thread(target = subscriber.main)
     t_subscriber.start()
 
-    t_update = threading.Thread(target = light_controller.update, args=(publisher, lock,))
+    t_update = threading.Thread(target = light_controller.update, args=(publisher, subscriber))
     t_update.start()
 
 
@@ -133,6 +91,6 @@ if __name__ == "__main__":
     t_subscriber.join()
     t_update.join()
 
-    
+    # python3 main.py --index 0  --source_url "http://b78c-2001-b400-e434-2f7e-c1f3-f180-3909-71cb.ngrok.io/video/playlist.m3u8" --target_url "http://b78c-2001-b400-e434-2f7e-c1f3-f180-3909-71cb.ngrok.io/api/fall"
 
 

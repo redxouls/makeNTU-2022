@@ -24,6 +24,16 @@ import VideoJS from "./Video"; // point to where the functional component is sto
 
 const { Paragraph } = Placeholder;
 
+class State {
+  constructor() {
+    this.index = 0;
+  }
+  setIndex(index) {
+    this.index = index;
+  }
+}
+const state = new State();
+
 const App = () => {
   const mapRef = useRef(null);
   const playerRef = useRef(null);
@@ -31,26 +41,14 @@ const App = () => {
   const [mapApp, setMapApp] = useState(null);
   const [open, setOpen] = useState(false);
   const [header, setHeader] = useState("");
-  const [type, setType] = useState("info");
 
-  const message = (
-    <Notification type={type} header={type} closable>
-      <Paragraph width={320} rows={3} />
-      fnwlekfnewlnflkenfklewnlfnewkflekwnflkewnfklwenk
-    </Notification>
-  );
-
-  const handleAlert = () => {
-    toaster.push(message, { placement: "topCenter" });
-  };
-
-  const handleShowDetail = (name) => {
+  const handleShowDetail = (index, name) => {
     setOpen(true);
     setHeader(name);
+    state.setIndex(index);
   };
 
   const handlers = {
-    handleAlert,
     handleShowDetail,
   };
 
@@ -109,17 +107,17 @@ const App = () => {
                 <h3>Brightness</h3>
               </div>
               <br />
-              <LightController />
+              <LightController state={state} />
               <Divider />
               <div style={{ textAlign: "center" }}>
                 <h3>Sensor Data</h3>
               </div>
               <br />
-              <Chart />
-
+              <Chart state={state} />
               <Divider />
               <div style={{ textAlign: "center" }}>
-                <h3>Monitor</h3>
+                <h3>Surveillance Camera</h3>
+                <br />
               </div>
               <VideoJS options={videoJsOptions} onReady={handlePlayerReady} />
             </Drawer.Body>

@@ -3,7 +3,7 @@ import styles from "./StreetLampMarker.module.css";
 class StreetLampMarker {
   constructor({ type, properties, geometry }, callback) {
     console.log(callback);
-    const { iconSize, name } = properties;
+    const { index, iconSize, name } = properties;
 
     const el = document.createElement("div");
     const width = iconSize[0];
@@ -15,7 +15,7 @@ class StreetLampMarker {
     el.style.backgroundSize = "100%";
 
     el.addEventListener("click", () => {
-      callback(name);
+      callback(index, name);
       console.log("Clicked");
     });
     this.el = el;
